@@ -7,6 +7,33 @@ load_dotenv(".env", override=True)
 
 app = FastAPI()
 
+
+def send_telegram(msg):
+    import os, requests
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
+    try:
+        requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={"chat_id": chat_id, "text": msg}, timeout=10)
+    except:
+        pass
+
+
+def send_telegram(msg):
+    import os, requests
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        requests.post(url, json={"chat_id": chat_id, "text": msg}, timeout=10)
+    except:
+        pass
+
+
+
 TICKERS = ["SPY","QQQ","XLF","XLV","XLI"]
 DEFENSIVE = ["TLT","GLD"]
 TOP_N = 3
@@ -90,6 +117,8 @@ def strategy_trade():
                         time_in_force="day",
                     )
                 orders.append({"symbol": ticker, "buy": qty, "dry_run": RUNTIME_DRY_RUN["value"]})
+
+    send_telegram("Strategy executed")
 
     return {
         "status": "strategy_executed",
