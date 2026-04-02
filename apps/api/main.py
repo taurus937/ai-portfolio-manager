@@ -7,8 +7,22 @@ load_dotenv(".env", override=True)
 
 app = FastAPI()
 
+def send_telegram(msg):
+    import os, requests
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
+    try:
+        requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={"chat_id": chat_id, "text": msg}, timeout=10)
+    except:
+        pass
+
+
 @app.get("/health")
 def health():
+    send_telegram("Strategy executed")
+
     return {"status": "ok"}
 
 @app.post("/alpaca/strategy-trade")
