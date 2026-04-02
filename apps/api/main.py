@@ -216,15 +216,17 @@ def dashboard():
 
 @app.get("/alpaca/account")
 def alpaca_account():
-    api = get_api()
-    account = api.get_account()
-    return {
-        "status": account.status,
-        "cash": account.cash,
-        "portfolio_value": account.portfolio_value,
-        "buying_power": account.buying_power,
-    }
-
+    try:
+        api = get_api()
+        account = api.get_account()
+        return {
+            "status": account.status,
+            "cash": account.cash,
+            "portfolio_value": account.portfolio_value,
+            "buying_power": account.buying_power,
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/alpaca/positions")
 def alpaca_positions():
