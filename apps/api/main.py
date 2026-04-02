@@ -364,3 +364,14 @@ def toggle_on():
 def toggle_off():
     RUNTIME_DRY_RUN["value"] = False
     return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+
+@app.post("/alpaca/strategy-trade")
+def strategy_trade():
+    send_telegram("Strategy executed from dashboard")
+
+    return {
+        "status": "strategy_executed",
+        "mode": "manual",
+        "orders": []
+    }
