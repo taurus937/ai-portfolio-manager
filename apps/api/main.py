@@ -205,11 +205,13 @@ def dashboard():
           const res = await fetch("/toggle/on", { method: "POST" });
           const data = await res.json();
           document.getElementById("toggleBox").textContent = JSON.stringify(data, null, 2);
+          await showToggle();
         }
         async function toggleOff() {
           const res = await fetch("/toggle/off", { method: "POST" });
           const data = await res.json();
           document.getElementById("toggleBox").textContent = JSON.stringify(data, null, 2);
+          await showToggle();
         }
       showToggle();showToggle();</script>
     </body>
@@ -303,3 +305,33 @@ def alpaca_trades():
         }
         for o in data
     ]
+
+
+@app.get("/toggle")
+def get_toggle():
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+@app.post("/toggle/on")
+def toggle_on():
+    RUNTIME_DRY_RUN["value"] = True
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+@app.post("/toggle/off")
+def toggle_off():
+    RUNTIME_DRY_RUN["value"] = False
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+
+@app.get("/toggle")
+def get_toggle():
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+@app.post("/toggle/on")
+def toggle_on():
+    RUNTIME_DRY_RUN["value"] = True
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
+
+@app.post("/toggle/off")
+def toggle_off():
+    RUNTIME_DRY_RUN["value"] = False
+    return {"dry_run": RUNTIME_DRY_RUN["value"]}
