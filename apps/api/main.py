@@ -184,3 +184,29 @@ def alpaca_pnl():
         "positions_market_value": round(total_market_value, 2),
         "positions": pos
     }
+
+
+@app.get("/alpaca/trades")
+def alpaca_trades():
+    import os, requests
+
+    headers = {
+        "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+        "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+    }
+
+    base = os.getenv("ALPACA_BASE_URL")
+    r = requests.get(base + "/v2/orders?status=all&limit=20", headers=headers, timeout=20)
+    data = r.json()
+
+    return [
+        {
+            "symbol": o.get("symbol"),
+            "side": o.get("side"),
+            "qty": o.get("qty"),
+            "status": o.get("status"),
+            "filled_avg_price": o.get("filled_avg_price"),
+            "created_at": o.get("created_at"),
+        }
+        for o in data
+    ]
