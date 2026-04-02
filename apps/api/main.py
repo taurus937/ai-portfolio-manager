@@ -41,6 +41,15 @@ def dashboard():
 
         <div class="card">
           <h2>Run Strategy</h2>
+        </div>
+
+        <div class="card">
+          <h2>Positions</h2>
+          <button onclick="loadPositions()">Load Positions</button>
+          <pre id="positionsBox">Click to load positions.</pre>
+        </div>
+
+        <div class="card">
           <button onclick="runStrategy()">Execute Strategy Trade</button>
           <pre id="strategyBox">Click the button to run the strategy.</pre>
         </div>
@@ -51,6 +60,12 @@ def dashboard():
           const res = await fetch("/alpaca/account");
           const data = await res.json();
           document.getElementById("accountBox").textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function loadPositions() {
+          const res = await fetch("/alpaca/positions");
+          const data = await res.json();
+          document.getElementById("positionsBox").textContent = JSON.stringify(data, null, 2);
         }
 
         async function runStrategy() {
@@ -85,3 +100,18 @@ def alpaca_account():
     }
 
 
+
+
+@app.get("/alpaca/positions")
+def alpaca_positions():
+    import os, requests
+    url = os.getenv("ALPACA_BASE_URL") + "/v2/positions"
+    r = requests.get(
+        url,
+        headers={
+            "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+            "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+        },
+        timeout=20,
+    )
+    return r.json()
