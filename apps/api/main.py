@@ -276,94 +276,27 @@ def alpaca_pnl():
 
 @app.get("/alpaca/trades")
 def alpaca_trades():
-    api = get_api()
-    orders = api.list_orders(status="all", limit=20)
+    import os, requests
+
+    headers = {
+        "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+        "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+    }
+
+    base = os.getenv("ALPACA_BASE_URL")
+
+    r = requests.get(base + "/v2/orders?status=all&limit=20", headers=headers, timeout=20)
+
+    data = r.json()
 
     return [
         {
-            "symbol": o.symbol,
-            "side": o.side,
-            "qty": o.qty,
-            "status": o.status,
-            "filled_avg_price": o.filled_avg_price,
-            "created_at": str(o.created_at),
+            "symbol": o.get("symbol"),
+            "side": o.get("side"),
+            "qty": o.get("qty"),
+            "status": o.get("status"),
+            "filled_avg_price": o.get("filled_avg_price"),
+            "created_at": o.get("created_at"),
         }
-        for o in orders
+        for o in data
     ]
-
-
-@app.get("/toggle")
-def get_toggle():
-    return {"dry_run": RUNTIME_DRY_RUN["value"]}
-
-@app.post("/toggle/off")
-def toggle_off():
-    RUNTIME_DRY_RUN["value"] = False
-    return {"dry_run": RUNTIME_DRY_RUN["value"]}
-
-@app.post("/toggle/on")
-def toggle_on():
-    RUNTIME_DRY_RUN["value"] = True
-    return {"dry_run": RUNTIME_DRY_RUN["value"]}
-
-
-import threading
-import time
-from datetime import datetime
-
-LAST_RUN = {"date": None}
-
-def run_scheduler():
-    while True:
-        try:
-            api = get_api()
-            clock = api.get_clock()
-            today = str(clock.timestamp.date())
-
-            if clock.is_open and LAST_RUN["date"] != today:
-                if not RUNTIME_DRY_RUN["value"]:
-                    print("Running scheduled strategy at market open...")
-                    strategy_trade()
-                else:
-                    print("Scheduler skipped (dry run ON)")
-                LAST_RUN["date"] = today
-            else:
-                print("Scheduler waiting... market open:", clock.is_open, "last_run:", LAST_RUN["date"])
-        except Exception as e:
-            print("Scheduler error:", e)
-
-        time.sleep(300)  # check every 5 minutes
-
-threading.Thread(target=run_scheduler, daemon=True).start()
-
-
-@app.get("/debug/env")
-def debug_env():
-    import os
-    return {
-        "has_key": bool(os.getenv("ALPACA_API_KEY")),
-        "has_secret": bool(os.getenv("ALPACA_SECRET_KEY")),
-        "base_url": os.getenv("ALPACA_BASE_URL"),
-        "key_len": len(os.getenv("ALPACA_API_KEY") or ""),
-        "secret_len": len(os.getenv("ALPACA_SECRET_KEY") or ""),
-    }
-
-
-@app.get("/debug/env")
-def debug_env():
-    import os
-    return {
-        "has_key": bool(os.getenv("ALPACA_API_KEY")),
-        "has_secret": bool(os.getenv("ALPACA_SECRET_KEY")),
-        "base_url": os.getenv("ALPACA_BASE_URL"),
-        "key_len": len(os.getenv("ALPACA_API_KEY") or ""),
-        "secret_len": len(os.getenv("ALPACA_SECRET_KEY") or ""),
-    }
-
-
-@app.get("/debug/alpaca-raw")
-def debug_alpaca_raw():
-    import os, requests
-    url = os.getenv("ALPACA_BASE_URL") + "/v2/account"
-    r = requests.get(url, headers={"APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"), "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY")}, timeout=20)
-    return {"status_code": r.status_code, "text": r.text[:500]}
