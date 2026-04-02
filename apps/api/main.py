@@ -45,6 +45,15 @@ def dashboard():
 
         <div class="card">
           <h2>Positions</h2>
+        </div>
+
+        <div class="card">
+          <h2>P&L</h2>
+          <button onclick="loadPnL()">Load P&L</button>
+          <pre id="pnlBox">Click to load P&L.</pre>
+        </div>
+
+        <div class="card">
           <button onclick="loadPositions()">Load Positions</button>
           <pre id="positionsBox">Click to load positions.</pre>
         </div>
@@ -60,6 +69,12 @@ def dashboard():
           const res = await fetch("/alpaca/account");
           const data = await res.json();
           document.getElementById("accountBox").textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function loadPnL() {
+          const res = await fetch("/alpaca/pnl");
+          const data = await res.json();
+          document.getElementById("pnlBox").textContent = JSON.stringify(data, null, 2);
         }
 
         async function loadPositions() {
@@ -115,3 +130,27 @@ def alpaca_positions():
         timeout=20,
     )
     return r.json()
+
+
+@app.get("/alpaca/pnl")
+def alpaca_pnl():
+    import os, requests
+
+    headers = {
+        "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+        "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+    }
+
+    base = os.getenv("ALPACA_BASE_URL")
+
+    acc = requests.get(base + "/v2/account", headers=headers, timeout=20).json()
+    pos = requests.get(base + "/v2/positions", headers=headers, timeout=20).json()
+
+    total_market_value = sum(float(p["market_value"]) for p in pos) if pos else 0
+
+    return {
+        "portfolio_value": acc.get("portfolio_value"),
+        "cash": acc.get("cash"),
+        "positions_market_value": round(total_market_value, 2),
+        "positions": pos
+    }
