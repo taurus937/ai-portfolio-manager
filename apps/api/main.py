@@ -224,3 +224,16 @@ def alpaca_trades():
         }
         for o in data
     ]
+
+
+@app.get("/debug/telegram")
+def debug_telegram():
+    import os
+    return {
+        "has_token": bool(os.getenv("TELEGRAM_BOT_TOKEN")),
+        "has_chat_id": bool(os.getenv("TELEGRAM_CHAT_ID")),
+        "token_len": len(os.getenv("TELEGRAM_BOT_TOKEN") or ""),
+        "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
+    }
+
+
