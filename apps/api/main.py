@@ -37,7 +37,7 @@ def dashboard():
     </head>
     <body>
       <div class="wrap">
-        <h1>AI Portfolio Dashboard</h1>
+        <h1>AI Portfolio Dashboard</h1><div class="card"><h2>Account</h2><button onclick="loadAccount()">Load Account</button><pre id="accountBox">Click to load account.</pre></div>
 
         <div class="card">
           <h2>Run Strategy</h2>
@@ -47,6 +47,12 @@ def dashboard():
       </div>
 
       <script>
+        async function loadAccount() {
+          const res = await fetch("/alpaca/account");
+          const data = await res.json();
+          document.getElementById("accountBox").textContent = JSON.stringify(data, null, 2);
+        }
+
         async function runStrategy() {
           const res = await fetch("/alpaca/strategy-trade", { method: "POST" });
           const data = await res.json();
