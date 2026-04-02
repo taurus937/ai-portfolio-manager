@@ -236,47 +236,43 @@ def alpaca_account():
 
 @app.get("/alpaca/positions")
 def alpaca_positions():
-    api = get_api()
-    positions = api.list_positions()
-    return [
-        {
-            "symbol": p.symbol,
-            "qty": p.qty,
-            "market_value": p.market_value
-        } for p in positions
-    ]
-
+    import os, requests
+    url = os.getenv("ALPACA_BASE_URL") + "/v2/positions"
+    r = requests.get(
+        url,
+        headers={
+            "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+            "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+        },
+        timeout=20,
+    )
+    return r.json()
 
 @app.get("/alpaca/pnl")
 def alpaca_pnl():
-    api = get_api()
-    account = api.get_account()
-    positions = api.list_positions()
+    import os, requests
 
-    total_unrealized = 0.0
-    total_market_value = 0.0
-
-    items = []
-    for p in positions:
-        unrealized = float(p.unrealized_pl)
-        market_value = float(p.market_value)
-        total_unrealized += unrealized
-        total_market_value += market_value
-        items.append({
-            "symbol": p.symbol,
-            "qty": p.qty,
-            "market_value": p.market_value,
-            "unrealized_pl": p.unrealized_pl,
-        })
-
-    return {
-        "portfolio_value": account.portfolio_value,
-        "cash": account.cash,
-        "positions_market_value": round(total_market_value, 2),
-        "total_unrealized_pl": round(total_unrealized, 2),
-        "positions": items
+    headers = {
+        "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+        "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
     }
 
+    base = os.getenv("ALPACA_BASE_URL")
+
+    # account
+    acc = requests.get(base + "/v2/account", headers=headers, timeout=20).json()
+
+    # positions
+    pos = requests.get(base + "/v2/positions", headers=headers, timeout=20).json()
+
+    total_market_value = sum(float(p["market_value"]) for p in pos) if pos else 0
+
+    return {
+        "portfolio_value": acc.get("portfolio_value"),
+        "cash": acc.get("cash"),
+        "positions_market_value": round(total_market_value, 2),
+        "positions": pos
+    }
 
 @app.get("/alpaca/trades")
 def alpaca_trades():
