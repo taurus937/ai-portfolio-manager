@@ -216,17 +216,23 @@ def dashboard():
 
 @app.get("/alpaca/account")
 def alpaca_account():
-    try:
-        api = get_api()
-        account = api.get_account()
-        return {
-            "status": account.status,
-            "cash": account.cash,
-            "portfolio_value": account.portfolio_value,
-            "buying_power": account.buying_power,
-        }
-    except Exception as e:
-        return {"error": str(e)}
+    import os, requests
+    url = os.getenv("ALPACA_BASE_URL") + "/v2/account"
+    r = requests.get(
+        url,
+        headers={
+            "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+            "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+        },
+        timeout=20,
+    )
+    data = r.json()
+    return {
+        "status": data.get("status"),
+        "cash": data.get("cash"),
+        "portfolio_value": data.get("portfolio_value"),
+        "buying_power": data.get("buying_power"),
+    }
 
 @app.get("/alpaca/positions")
 def alpaca_positions():
