@@ -369,7 +369,6 @@ def toggle_off():
 @app.post("/alpaca/strategy-trade")
 def strategy_trade():
     send_telegram("Strategy executed from dashboard")
-
     return {
         "status": "strategy_executed",
         "mode": "manual",
