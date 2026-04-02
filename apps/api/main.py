@@ -49,6 +49,24 @@ def dashboard():
 
         <div class="card">
           <h2>P&L</h2>
+        </div>
+
+        <div class="card">
+          <h2>Trade History</h2>
+          <button onclick="loadTrades()">Load Trades</button>
+          <pre id="tradesBox">Click to load trades.</pre>
+        </div>
+
+        <div class="card">
+        </div>
+
+        <div class="card">
+          <h2>Trade History</h2>
+          <button onclick="loadTrades()">Load Trades</button>
+          <pre id="tradesBox">Click to load trades.</pre>
+        </div>
+
+        <div class="card">
           <button onclick="loadPnL()">Load P&L</button>
           <pre id="pnlBox">Click to load P&L.</pre>
         </div>
@@ -69,6 +87,18 @@ def dashboard():
           const res = await fetch("/alpaca/account");
           const data = await res.json();
           document.getElementById("accountBox").textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function loadTrades() {
+          const res = await fetch("/alpaca/trades");
+          const data = await res.json();
+          document.getElementById("tradesBox").textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function loadTrades() {
+          const res = await fetch("/alpaca/trades");
+          const data = await res.json();
+          document.getElementById("tradesBox").textContent = JSON.stringify(data, null, 2);
         }
 
         async function loadPnL() {
