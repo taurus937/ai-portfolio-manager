@@ -127,7 +127,7 @@ def dashboard():
         </div>
         <div class="card">
           <h2>Run Strategy</h2>
-          <button onclick="runStrategy()">Execute Strategy Trade</button>
+          <button onclick="runStrategy()"><span id="runBtnText">Execute Strategy Trade</span></button>
           <pre id="strategyBox">Click the button to run the strategy.</pre>
         </div>
 
@@ -184,6 +184,7 @@ def dashboard():
           document.getElementById("tradesBox").textContent = JSON.stringify(data, null, 2);
         }
         async function showToggle() {
+          const btn = document.getElementById("runBtnText");
           const res = await fetch("/toggle");
           const data = await res.json();
           document.getElementById("toggleBox").textContent = JSON.stringify(data, null, 2);
@@ -192,10 +193,12 @@ def dashboard():
             banner.textContent = "SAFE MODE: DRY RUN ON";
             banner.style.background = "#14532d";
             banner.style.color = "#dcfce7";
+            btn.textContent = "Preview Strategy Trade";
           } else {
             banner.textContent = "LIVE PAPER TRADING: DRY RUN OFF";
             banner.style.background = "#7f1d1d";
             banner.style.color = "#fee2e2";
+            btn.textContent = "Execute LIVE Paper Trade";
           }
         }
         async function toggleOn() {
