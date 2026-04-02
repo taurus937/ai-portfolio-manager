@@ -357,3 +357,11 @@ def debug_env():
         "key_len": len(os.getenv("ALPACA_API_KEY") or ""),
         "secret_len": len(os.getenv("ALPACA_SECRET_KEY") or ""),
     }
+
+
+@app.get("/debug/alpaca-raw")
+def debug_alpaca_raw():
+    import os, requests
+    url = os.getenv("ALPACA_BASE_URL") + "/v2/account"
+    r = requests.get(url, headers={"APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"), "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY")}, timeout=20)
+    return {"status_code": r.status_code, "text": r.text[:500]}
