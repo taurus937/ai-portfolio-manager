@@ -62,3 +62,26 @@ def dashboard():
     </body>
     </html>
     """
+
+
+@app.get("/alpaca/account")
+def alpaca_account():
+    import os, requests
+    url = os.getenv("ALPACA_BASE_URL") + "/v2/account"
+    r = requests.get(
+        url,
+        headers={
+            "APCA-API-KEY-ID": os.getenv("ALPACA_API_KEY"),
+            "APCA-API-SECRET-KEY": os.getenv("ALPACA_SECRET_KEY"),
+        },
+        timeout=20,
+    )
+    data = r.json()
+    return {
+        "status": data.get("status"),
+        "cash": data.get("cash"),
+        "portfolio_value": data.get("portfolio_value"),
+        "buying_power": data.get("buying_power"),
+    }
+
+
