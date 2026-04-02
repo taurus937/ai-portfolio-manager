@@ -333,3 +333,15 @@ def run_scheduler():
         time.sleep(300)  # check every 5 minutes
 
 threading.Thread(target=run_scheduler, daemon=True).start()
+
+
+@app.get("/debug/env")
+def debug_env():
+    import os
+    return {
+        "has_key": bool(os.getenv("ALPACA_API_KEY")),
+        "has_secret": bool(os.getenv("ALPACA_SECRET_KEY")),
+        "base_url": os.getenv("ALPACA_BASE_URL"),
+        "key_len": len(os.getenv("ALPACA_API_KEY") or ""),
+        "secret_len": len(os.getenv("ALPACA_SECRET_KEY") or ""),
+    }
