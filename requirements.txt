@@ -11,3 +11,4 @@ python-dotenv
 pytest
 yfinance
 requests
+alpaca-trade-api
