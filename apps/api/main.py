@@ -21,12 +21,11 @@ def send_telegram(msg):
 
 @app.get("/health")
 def health():
-    send_telegram("Strategy executed")
-
     return {"status": "ok"}
 
 @app.post("/alpaca/strategy-trade")
 def strategy_trade():
+    send_telegram("Strategy executed")
     return {
         "status": "strategy_executed",
         "mode": "manual",
@@ -237,3 +236,9 @@ def debug_telegram():
     }
 
 
+
+
+@app.get("/debug/test-telegram")
+def test_telegram():
+    send_telegram("Test message from Render app")
+    return {"status": "sent"}
